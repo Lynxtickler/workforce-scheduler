@@ -12,21 +12,20 @@ from .employee import Employee
 class Employees:
     """Maintains a list of employees.
 
-    Capable of creating random lists for testing purposes.
+    Capable of creating random collections of employees for testing purposes.
 
     Attributes:
-        list:
+        collection:
             A dictionary of current employees. Keys are employee IDs and items instances of Employee class.
-            Named in a potentially confusing way. Might need renaming.
     """
 
     def __init__(self, employee_list=None):
         """Initialise the object with an existing dictionary of employees or empty dictionary."""
-        self.list = {} if (employee_list is None) else employee_list
+        self.collection = {} if (employee_list is None) else employee_list
 
     def count(self):
         """Return the number of current employees."""
-        return len(self.list)
+        return len(self.collection)
 
     def add(self, employee):
         """Add employee to dictionary.
@@ -39,7 +38,7 @@ class Employees:
         """
         if not isinstance(employee, Employee):
             return False
-        self.list[employee.id] = employee
+        self.collection[employee.id] = employee
         return True
 
     def remove(self, employee):
@@ -49,7 +48,7 @@ class Employees:
             employee:
                 Employee instance to remove from dictionary.
         """
-        self.list.pop(employee.id, None)
+        self.collection.pop(employee.id, None)
 
     def generate_employee_id(self):
         """Create ID for employee randomly.
@@ -69,7 +68,7 @@ class Employees:
         Args:
             checked_id: ID whose value is checked for uniqueness.
         """
-        for _, employee in self.list.items():
+        for _, employee in self.collection.items():
             if checked_id == employee.id:
                 return True
         return False
@@ -112,7 +111,7 @@ class Employees:
                 break
             if new_employee.seniority != 0:
                 seniors_created += 1
-            self.list[new_employee.id] = new_employee
+            self.collection[new_employee.id] = new_employee
             employee_hours_currently += ((new_employee.min_hours + new_employee.max_hours) / 2)
             # Add ~7% extra employees for more probable feasibility.
             if i % 15 == 0:
@@ -124,7 +123,7 @@ class Employees:
         print('total (avg) hours :',
               employee_hours_currently / PERIODS_PER_HOUR)
         if not seniors_created:
-            _, random_employee = random.choice(list(self.list.items()))
+            _, random_employee = random.choice(list(self.collection.items()))
             random_employee.seniority = 1
         return employee_hours_currently >= total_weekly_hours
 

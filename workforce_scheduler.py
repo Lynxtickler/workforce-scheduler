@@ -55,7 +55,7 @@ class Scheduler:
         self.accuracy = accuracy if accuracy else DEFAULT_OPTIMISATION_ACCURACY
         self.time_limit = time_limit
         self.debug = debug
-        [print(x.to_text()) for _, x in self.employees.list.items()]
+        [print(x.to_text()) for _, x in self.employees.collection.items()]
 
     def run(self, time_limit=None):
         """Create LP problem from employees.
@@ -77,7 +77,7 @@ class Scheduler:
     def create_lp_problem(self):
         """Create the LP problem for this scheduler."""
         self.problem = LpProblem('schedule', LpMinimize)
-        for _, employee in self.employees.list.items():
+        for _, employee in self.employees.collection.items():
             employee.set_employee_shifts(self.work_site_demands)
         print(f'All shifts created in {time.time() - START_TIME}s')
         decision_variables = self.create_decision_variables()
@@ -119,11 +119,11 @@ class Scheduler:
                     if shift.value() != 0:
                         employee_id, day_index, shift_index = self.get_decision_var_ids(shift)
                         print(shift, '->', shift.value(), '->',
-                              self.employees.list[employee_id].shifts[day_index][shift_index])
-                        employee_hours += len(self.employees.list[employee_id].shifts[day_index][shift_index])
+                              self.employees.collection[employee_id].shifts[day_index][shift_index])
+                        employee_hours += len(self.employees.collection[employee_id].shifts[day_index][shift_index])
 
-            min_h = self.employees.list[key].min_hours / PERIODS_PER_HOUR
-            max_h = self.employees.list[key].max_hours / PERIODS_PER_HOUR
+            min_h = self.employees.collection[key].min_hours / PERIODS_PER_HOUR
+            max_h = self.employees.collection[key].max_hours / PERIODS_PER_HOUR
             raw_h = employee_hours / PERIODS_PER_HOUR / number_of_weeks
             print(f'Employee {key} hours:', round(raw_h, 2), f'{min_h}-{max_h}')
             days_off_list = []
@@ -183,7 +183,7 @@ class Scheduler:
         subsequent_days_off = {}
         weekends_off = {}
         recent_days_off = {}
-        for _, employee in self.employees.list.items():
+        for _, employee in self.employees.collection.items():
             x_eds[employee.id] = []
             days_off[employee.id] = []
             subsequent_days_off[employee.id] = []
@@ -242,7 +242,7 @@ class Scheduler:
         period_surplus_variables = decision_variables['workforce']
         day_pairs = decision_variables['pairs']
         weekends_off = decision_variables['weekends']
-        for _, employee in self.employees.list.items():
+        for _, employee in self.employees.collection.items():
             shift_count = len(employee.shifts)
             for day_index in range(shift_count):
                 for shift_index, shift in enumerate(employee.shifts[day_index]):
@@ -303,7 +303,7 @@ class Scheduler:
                 # Create a vector to hold all shifts that contain said period.
                 all_shifts_matching_period = []
                 # Iterate over each employee.
-                for _, employee in self.employees.list.items():
+                for _, employee in self.employees.collection.items():
                     # Iterate over each open shift for the employee on the given day.
                     shift_count = len(employee.shifts[day_index])
                     for shift_index in range(shift_count):
@@ -341,7 +341,7 @@ class Scheduler:
 
         # Add multiple constraints employee by employee.
         # Iterate over employees.
-        for _, employee in self.employees.list.items():
+        for _, employee in self.employees.collection.items():
             employee_weekly_shifts = []
             streaks_start_index = MAXIMUM_CONSECUTIVE_WORKDAYS - employee.current_workday_streak
             # Iterate over every day for each employee.
